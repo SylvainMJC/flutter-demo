@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../../bo/product.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import '../../providers/cart_provider.dart';
 
 class ListProductsPage extends StatelessWidget {
@@ -33,26 +32,51 @@ class ListProductsPage extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text("Erreur : ${snapshot.error}"));
+            return Center(
+                child: Text("Erreur : ${snapshot.error}",
+                    style: const TextStyle(fontSize: 18, color: Colors.red)));
           } else if (snapshot.hasData) {
             final listProducts = snapshot.data!;
             return ListView.builder(
+              padding: const EdgeInsets.all(8.0),
               itemCount: listProducts.length,
               itemBuilder: (context, index) {
                 final product = listProducts[index];
                 return InkWell(
                   onTap: () => context.go("/detail/${product.id}"),
-                  child: ListTile(
-                    leading: Hero(
-                      tag: product.image,
-                      child: Image.network(
-                        product.image,
-                        width: 50,
-                        height: 50,
+                  child: Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                    child: ListTile(
+                      leading: Hero(
+                        tag: product.image,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            product.image,
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      title: Text(
+                        product.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        product.displayPrice(),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                       ),
                     ),
-                    title: Text(product.title),
-                    subtitle: Text(product.displayPrice()),
                   ),
                 );
               },

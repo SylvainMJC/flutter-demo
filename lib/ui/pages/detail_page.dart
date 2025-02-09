@@ -5,13 +5,12 @@ import '../../bo/product.dart';
 import '../../providers/cart_provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import '../widgets/navbar.dart';
 
 class DetailPage extends StatefulWidget {
   final int idProduct;
 
-  DetailPage({super.key, required this.idProduct});
+  const DetailPage({super.key, required this.idProduct});
 
   @override
   _DetailPageState createState() => _DetailPageState();
@@ -40,52 +39,88 @@ class _DetailPageState extends State<DetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: Navbar(title: "Produit n° ${widget.idProduct}"),
+      appBar: Navbar(title: "Détail du produit"),
       body: FutureBuilder<Product>(
         future: productFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text("Erreur : ${snapshot.error}"));
+            return Center(
+                child: Text("Erreur : ${snapshot.error}",
+                    style: const TextStyle(fontSize: 18, color: Colors.red)));
           } else if (snapshot.hasData) {
             final product = snapshot.data!;
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Hero(
-                  tag: product.image,
-                  child: Image.network(
-                    product.image,
-                    width: 100,
-                    height: 100,
-                  ),
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Hero(
+                        tag: product.image,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            product.image,
+                            width: 150,
+                            height: 150,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      product.title,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      product.displayPrice(),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      product.description,
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Catégorie : ${product.category}',
+                      style: const TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          textStyle: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        onPressed: () {
+                          context.read<CartProvider>().add(product);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("Produit ajouté au panier")),
+                          );
+                        },
+                        child: const Text("Ajouter au panier"),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const ButtunReverserEssai(),
+                  ],
                 ),
-                TitleAndPriceRow(product: product),
-                Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Text(
-                    '${product.description} ',
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
-                ),
-                Text(
-                  'Catégorie : ${product.category}',
-                  style: Theme.of(context).textTheme.labelLarge,
-                ),
-                const Spacer(),
-                ElevatedButton(
-                  onPressed: () {
-                    context.read<CartProvider>().add(product);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Produit ajouté au panier")),
-                    );
-                  },
-                  child: const Text("Ajouter au panier"),
-                ),
-                const SizedBox(height: 10),
-                const ButtunReverserEssai()
-              ],
+              ),
             );
           } else {
             return const Center(child: Text("Produit introuvable"));
@@ -106,33 +141,15 @@ class ButtunReverserEssai extends StatelessWidget {
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
         child: ElevatedButton(
-            onPressed: () {}, child: const Text("Réserver un essai")),
-      ),
-    );
-  }
-}
-
-class TitleAndPriceRow extends StatelessWidget {
-  const TitleAndPriceRow({super.key, required this.product});
-
-  final Product product;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Text(
-            product.title,
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
-          Text(
-            product.displayPrice(),
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
-        ],
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.grey.shade200,
+              foregroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              textStyle:
+                  const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
+            onPressed: () {},
+            child: const Text("Réserver un essai")),
       ),
     );
   }
