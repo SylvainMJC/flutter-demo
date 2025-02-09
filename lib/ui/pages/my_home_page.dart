@@ -10,12 +10,11 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   Product product = Product(
     id: 1,
-    name: 'Laptop',
+    title: 'Laptop',
     description: 'A high-performance laptop',
     category: 'Electronics',
     image: 'laptop.png',
@@ -48,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
             //   style: Theme.of(context).textTheme.headlineMedium,
             // ),
             Text(
-              '${product.name} : ${product.displayPrice()}',
+              '${product.title} : ${product.displayPrice()}',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             Padding(
